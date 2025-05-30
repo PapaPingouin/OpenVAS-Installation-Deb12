@@ -31,7 +31,7 @@ sudo su
 ### 3. Download the Script:
 
 ```bash
-curl -f -L https://raw.githubusercontent.com/Kastervo/OpenVAS-Installation/master/openvas_install.sh -o openvas_install.sh
+curl -f -L https://raw.githubusercontent.com/PapaPingouin/OpenVAS-Installation-Deb12/refs/heads/master/openvas_install.sh -o openvas_install.sh
 ```
 
 ### 4. Make the Script Executable:
