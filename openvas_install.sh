@@ -184,7 +184,7 @@ create_gvm_user() {
 	if getent passwd gvm > /dev/null 2>&1; then
 		log WARN "GVM user already exists, skipping creation. Verify user settings."
 	else
-		run_command useradd -r -M -U -G sudo -s /usr/sbin/nologin gvm
+		run_command useradd -r -M -U -s /usr/sbin/nologin gvm
 		if ! run_command usermod -aG gvm "$USER"; then
 			log WARN "Failed to add $USER to gvm group. Manual addition may be required."
 		else
@@ -844,28 +844,6 @@ feed_validation() {
 	log INFO "Feed validation setup completed."
 }
 
-# Configures sudo for the gvm group to run openvas with elevated privileges.
-setting_up_sudo_for_scanning() {
-	log INFO "Configuring sudo for gvm group..."
-	if grep -Fxq "%gvm ALL = NOPASSWD: /usr/local/sbin/openvas" /etc/sudoers.d/gvm; then
-		log INFO "Sudo already configured for gvm group."
-	else
-		log INFO "Setting up sudoers file for gvm group..."
-		if ! run_command sh -c "echo '%gvm ALL = NOPASSWD: /usr/local/sbin/openvas' > /etc/sudoers.d/gvm"; then
-			log ERROR "Failed to create sudoers file for gvm."
-			exit 1
-		fi
-		if ! run_command chmod 0440 /etc/sudoers.d/gvm; then
-			log ERROR "Failed to set permissions for sudoers file."
-			exit 1
-		fi
-		if ! run_command visudo -c -f /etc/sudoers.d/gvm; then
-			log ERROR "Sudoers file validation failed for /etc/sudoers.d/gvm."
-			exit 1
-		fi
-		log INFO "Sudo configuration for gvm group completed."
-	fi
-}
 
 # Sets up PostgreSQL database for gvmd.
 setting_up_postgresql() {
@@ -1287,10 +1265,6 @@ main() {
 	# Feed Validation
 	# URL: https://greenbone.github.io/docs/latest/22.4/source-build/index.html#feed-validation
 	feed_validation
-
-	# Setting up sudo for Scanning
-	# URL: https://greenbone.github.io/docs/latest/22.4/source-build/index.html#setting-up-sudo-for-scanning
-	setting_up_sudo_for_scanning
 
 	# Setting up PostgreSQL
 	# URL: https://greenbone.github.io/docs/latest/22.4/source-build/index.html#setting-up-postgresql
